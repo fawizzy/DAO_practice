@@ -30,14 +30,14 @@ describe("DAO", function () {
     expect((await dao.getProposalById(0)).title).to.be.equal("title1");
   })
 
-  it("vote", async function(){
+  it("approve count should be one", async function(){
     const {dao, admin1, admin2, admin3 } = await deployDAO()
     await dao.createProposal("title1")
     await dao.connect(admin1).vote(0, true);
     expect((await dao.getProposalById(0)).approveCount).to.be.equal(1);
   })
 
-  it("vote", async function(){
+  it("approve count should be 2", async function(){
     const {dao, admin1, admin2, admin3 } = await deployDAO()
     await dao.createProposal("title1")
     await dao.connect(admin1).vote(0, true);
@@ -45,6 +45,29 @@ describe("DAO", function () {
     expect((await dao.getProposalById(0)).approveCount).to.be.equal(2);
   })
 
+  it("should revert vote if proposal have more than 1 one accepted vote", async function(){
+    const {dao, admin1, admin2, admin3 } = await deployDAO()
+    await dao.createProposal("title1")
+    await dao.connect(admin1).vote(0, true);
+    await dao.connect(admin2).vote(0, true);
+
+    await expect((dao.connect(admin3).vote(0, true))).to.be.revertedWith("Proposal has been finalised");
+  })
+
+  it("should revert if same admin vote more than once", async function(){
+    const {dao, admin1, admin2, admin3 } = await deployDAO()
+    await dao.createProposal("title1")
+    await dao.connect(admin1).vote(0, true);
+
+    await expect(dao.connect(admin1).vote(0, true)).to.be.revertedWith("voted this proposal already");
+  })
+
+  it("should revert if none admin tries to vote", async function(){
+    const {dao, admin1, admin2, admin3 } = await deployDAO()
+    await dao.createProposal("title1")
+
+    await expect(dao.vote(0, true)).to.be.revertedWith("only admin can vote");
+  })
   
 
 

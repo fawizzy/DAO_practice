@@ -65,6 +65,8 @@ contract DAO {
                 rejectedProposals.push(idToProposal[_proposalId]);
             }
         }
+
+        hasVote[_proposalId][msg.sender] = true;
     }
 
     function createProposal(
