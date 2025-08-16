@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 contract DAO {
     address immutable owner;
-    uint256 proposalId = 1;
+    uint256 proposalId = 0;
 
     mapping(address => bool) isMember;
     mapping(address => bool) isAdmin;
@@ -54,13 +54,13 @@ contract DAO {
         );
         if (_approve) {
             idToProposal[_proposalId].approveCount++;
-            if (idToProposal[_proposalId].approveCount >= 1) {
+            if (idToProposal[_proposalId].approveCount > 1) {
                 idToProposal[_proposalId].status = Status.PASSED;
                 acceptedProposals.push(idToProposal[_proposalId]);
             }
         } else {
             idToProposal[_proposalId].rejectCount++;
-            if (idToProposal[_proposalId].rejectCount >= 1) {
+            if (idToProposal[_proposalId].rejectCount > 1) {
               idToProposal[_proposalId].status = Status.FAILED;
                 rejectedProposals.push(idToProposal[_proposalId]);
             }

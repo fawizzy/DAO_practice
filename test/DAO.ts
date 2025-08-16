@@ -4,6 +4,7 @@ import {
   loadFixture,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
+import { assert } from "console";
 import hre from "hardhat";
 
 describe("DAO", function () {
@@ -18,15 +19,33 @@ describe("DAO", function () {
     const DAO = await hre.ethers.getContractFactory("DAO");
     const dao = await DAO.deploy(admin1.address, admin2.address, admin3.address);
 
-    return { dao };
+    return { dao, admin1, admin2, admin3 };
   }
 
 
-  it("", async function(){
+  it("create proposal", async function(){
     const {dao } = await deployDAO()
     await dao.createProposal("title1")
-    console.log(await dao.getProposalById(0))
+    console.log(await dao.getProposalById(0));
+    expect((await dao.getProposalById(0)).title).to.be.equal("title1");
   })
+
+  it("vote", async function(){
+    const {dao, admin1, admin2, admin3 } = await deployDAO()
+    await dao.createProposal("title1")
+    await dao.connect(admin1).vote(0, true);
+    expect((await dao.getProposalById(0)).approveCount).to.be.equal(1);
+  })
+
+  it("vote", async function(){
+    const {dao, admin1, admin2, admin3 } = await deployDAO()
+    await dao.createProposal("title1")
+    await dao.connect(admin1).vote(0, true);
+    await dao.connect(admin2).vote(0, true);
+    expect((await dao.getProposalById(0)).approveCount).to.be.equal(2);
+  })
+
+  
 
 
 
