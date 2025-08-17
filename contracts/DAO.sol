@@ -72,6 +72,7 @@ contract DAO {
     function createProposal(
         string memory _title
     ) external {
+        require(isMember[msg.sender]||isAdmin[msg.sender], "not a membeer");
         idToProposal[proposalId] = Proposal(
             proposalId,
             _title,
